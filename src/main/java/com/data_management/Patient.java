@@ -3,6 +3,7 @@ package com.data_management;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Represents a patient and manages their medical records.
  * This class stores patient-specific data, allowing for the addition and
@@ -65,4 +66,11 @@ public class Patient {
         return filteredRecords;
     }
 
+    /**
+     * Gets the ID of the patient.
+     * @return the patient ID
+     */
+    public int getPatientId() {
+        return this.patientId;
+    }
 }

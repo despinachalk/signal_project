@@ -1,19 +1,18 @@
 package com.cardio_generator.generators;
 
 import java.util.Random;
-
 import com.cardio_generator.outputs.OutputStrategy;
 
 public class AlertGenerator implements PatientDataGenerator {
-// Changed variable to upper case to follow standards
+    // Changed variable to upper case to follow standards
     public static final Random RANDOM_GENERATOR = new Random();
     // furthermore changed this to lower case as its local variable
     private boolean[] alertStates; // false = resolved, true = pressed
 
-   /*
-   first constructs AlertGenerator and puts every patient to false so its resolved
-   @param patientCount being the total num of patients being monitored
-    */
+    /*
+    first constructs AlertGenerator and puts every patient to false so its resolved
+    @param patientCount being the total num of patients being monitored
+     */
     public AlertGenerator(int patientCount) {
         alertStates = new boolean[patientCount + 1];
     }
