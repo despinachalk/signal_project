@@ -1,5 +1,5 @@
 package com.data_management;
-import com.alerts.Alert;
+import com.alerts.AlertInterface;
 /**
  * Interface defining the contract for different types of health alerts.
  * Implements the Strategy Pattern to allow new alert types to be added
@@ -11,5 +11,5 @@ public interface AlertStrategy {
      * @param patient The patient whose data is being evaluated.
      * @return An Alert object if the condition is met, or null if it is not.
      */
-    Alert checkAlert(Patient patient);
+    AlertInterface checkAlert(Patient patient);
 }

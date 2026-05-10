@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-  Strategy to evaluate if a patient's blood pressure shows a critical trend.
-  Triggers if 3 consecutive readings increase or decrease by more than 10 mmHg each.
+  * Strategy to evaluate if a patient's blood pressure shows a critical trend.
+  * Triggers if 3 consecutive readings increase or decrease by more than 10 mmHg each.
  */
 public class BloodPressureTrendStrategy implements AlertStrategy {
 

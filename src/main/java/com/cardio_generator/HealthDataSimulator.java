@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+
 /*
 the main application class is responsible for simulating healthcare data for multiple patients.
 it sets up the data generators then configures the selected output strategy and schedules
@@ -35,6 +36,26 @@ public class HealthDataSimulator {
     private static ScheduledExecutorService scheduler;
     private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
     private static final Random random = new Random();
+
+    private static HealthDataSimulator instance;
+
+    /**
+     * Private constructor to prevent instantiation from other classes.
+     */
+    private HealthDataSimulator() {
+    }
+
+    /**
+     * Static method to provide a global point of access to the HealthDataSimulator instance.
+     * * @return the single instance of HealthDataSimulator
+     */
+    public static synchronized HealthDataSimulator getInstance() {
+        if (instance == null) {
+            instance = new HealthDataSimulator();
+        }
+        return instance;
+    }
+
     /*
     main entry point for the HealthDataSimulator app.
     parses command line args ,initializes output strategy , creates list with patients
@@ -116,6 +137,7 @@ public class HealthDataSimulator {
             }
         }
     }
+
     // prints the help menu with supported command line arguments to the console
     private static void printHelp() {
         System.out.println("Usage: java HealthDataSimulator [options]");
@@ -133,6 +155,7 @@ public class HealthDataSimulator {
         System.out.println(
                 "  This command simulates data for 100 patients and sends the output to WebSocket clients connected to port 8080.");
     }
+
     /*
     initializes a list of sequential patient IDs.
 
@@ -146,6 +169,7 @@ public class HealthDataSimulator {
         }
         return patientIds;
     }
+
     /*
      schedules periodic data generation tasks for a list of patients.
      different health metrics are scheduled at different intervals.
@@ -167,7 +191,8 @@ public class HealthDataSimulator {
             scheduleTask(() -> alertGenerator.generate(patientId, outputStrategy), 20, TimeUnit.SECONDS);
         }
     }
-/*
+
+    /**
     schedules a specific task to run periodically with an initial random delay.
 
      @param task     the Runnable task to be executed

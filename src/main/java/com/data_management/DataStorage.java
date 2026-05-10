@@ -14,6 +14,7 @@ import com.alerts.AlertGenerator;
  */
 public class DataStorage {
     private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
+    private static DataStorage instance; // The single instance for the Singleton pattern
 
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
@@ -21,6 +22,17 @@ public class DataStorage {
      */
     public DataStorage() {
         this.patientMap = new HashMap<>();
+    }
+
+    /**
+     * Static method to provide a global point of access to the DataStorage instance.
+     * * @return the single instance of DataStorage
+     */
+    public static synchronized DataStorage getInstance() {
+        if (instance == null) {
+            instance = new DataStorage();
+        }
+        return instance;
     }
 
     /**
@@ -32,9 +44,9 @@ public class DataStorage {
      * @param patientId        the unique identifier of the patient
      * @param measurementValue the value of the health metric being recorded
      * @param recordType       the type of record, e.g., "HeartRate",
-     *                         "BloodPressure"
+     * "BloodPressure"
      * @param timestamp        the time at which the measurement was taken, in
-     *                         milliseconds since the Unix epoch
+     * milliseconds since the Unix epoch
      */
     public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
         Patient patient = patientMap.get(patientId);
@@ -50,13 +62,13 @@ public class DataStorage {
      * a time range.
      *
      * @param patientId the unique identifier of the patient whose records are to be
-     *                  retrieved
+     * retrieved
      * @param startTime the start of the time range, in milliseconds since the Unix
-     *                  epoch
+     * epoch
      * @param endTime   the end of the time range, in milliseconds since the Unix
-     *                  epoch
+     * epoch
      * @return a list of PatientRecord objects that fall within the specified time
-     *         range
+     * range
      */
     public List<PatientRecord> getRecords(int patientId, long startTime, long endTime) {
         Patient patient = patientMap.get(patientId);
@@ -79,17 +91,15 @@ public class DataStorage {
      * The main method for the DataStorage class.
      * Initializes the system, reads data into storage, and continuously monitors
      * and evaluates patient data.
-     * 
-     * @param args command line arguments
+     * * @param args command line arguments
      */
     public static void main(String[] args) {
         // DataReader is not defined in this scope, should be initialized appropriately.
         // DataReader reader = new SomeDataReaderImplementation("path/to/data");
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
 
         // Assuming the reader has been properly initialized and can read data into the
-        // storage
-        // reader.readData(storage);
+        // storage reader.readData(storage);
 
         // Example of using DataStorage to retrieve and print records for a patient
         List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);

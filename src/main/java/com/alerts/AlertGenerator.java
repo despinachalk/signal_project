@@ -3,12 +3,11 @@ package com.alerts;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.AlertStrategy;
-import com.data_management.BloodPressureThresholdStrategy;
-import com.data_management.BloodPressureTrendStrategy;
+import com.data_management.BloodPressureStrategy;
+import com.data_management.HeartRateStrategy;
+import com.data_management.OxygenSaturationStrategy;
 import com.data_management.ManualAlertStrategy;
-import com.data_management.BloodSaturationStrategy;
 import com.data_management.HypotensiveHypoxemiaStrategy;
-import com.data_management.EcgAlertStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +32,14 @@ public class AlertGenerator {
 
         // Initialize the strategies list and register our strategies
         this.alertStrategies = new ArrayList<>();
-        this.alertStrategies.add(new BloodPressureThresholdStrategy());
-        this.alertStrategies.add(new BloodPressureTrendStrategy());
+
+        // Updated to include the concrete strategies
+        this.alertStrategies.add(new BloodPressureStrategy());
+        this.alertStrategies.add(new HeartRateStrategy());
+        this.alertStrategies.add(new OxygenSaturationStrategy());
+
+        // Keeping your existing specialized strategies
         this.alertStrategies.add(new ManualAlertStrategy());
-        this.alertStrategies.add(new BloodSaturationStrategy());
-        this.alertStrategies.add(new EcgAlertStrategy());
         this.alertStrategies.add(new HypotensiveHypoxemiaStrategy());
     }
 
@@ -50,9 +52,18 @@ public class AlertGenerator {
     public void evaluateData(Patient patient) {
         // Loop through all registered strategies and check for alerts
         for (AlertStrategy strategy : alertStrategies) {
-            Alert potentialAlert = strategy.checkAlert(patient);
+            // Updated to AlertInterface to support the Decorator pattern
+            AlertInterface potentialAlert = strategy.checkAlert(patient);
 
             if (potentialAlert != null) {
+                // Logic to apply Decorators dynamically based on conditions
+                if (potentialAlert.getCondition().toLowerCase().contains("critical") ||
+                        potentialAlert.getCondition().toLowerCase().contains("urgent")) {
+
+                    // Wrap the alert in a Priority decorator
+                    potentialAlert = new PriorityAlertDecorator(potentialAlert);
+                }
+
                 triggerAlert(potentialAlert);
             }
         }
@@ -63,7 +74,7 @@ public class AlertGenerator {
      *
      * @param alert the alert object containing details about the alert condition
      */
-    private void triggerAlert(Alert alert) {
+    private void triggerAlert(AlertInterface alert) { // Updated parameter to AlertInterface
         System.out.println("ALERT TRIGGERED: Patient " + alert.getPatientId()
                 + " - Condition: " + alert.getCondition()
                 + " at time " + alert.getTimestamp());
