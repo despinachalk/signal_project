@@ -19,6 +19,8 @@ Added the 4 required UML class diagrams for the CHMS subsystems (Alert Generatio
 You can view the diagrams and the design rationale in the [uml_models](./uml_models) directory.
 ## Reports
 Theres a file called reports that inlcudes inside it all the documantations needed along with their screenshots from the testing results found here:[reports](./reports)
+## Week 5 Results 
+ Press here: [Week_5_Testing_Results](./Week_5_Testing_Results) to view the final results of this Project.
 ### Prerequisites
 
 - Java JDK 11 or newer.
