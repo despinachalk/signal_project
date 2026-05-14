@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.alerts.AlertGenerator;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages storage and retrieval of patient data within a healthcare monitoring
@@ -13,9 +14,8 @@ import com.alerts.AlertGenerator;
  * patient IDs.
  */
 public class DataStorage {
-    private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
-    private static DataStorage instance; // The single instance for the Singleton pattern
-
+    private Map<Integer, Patient> patientMap = new ConcurrentHashMap<>();// Switch to ConcurrentHashMap to handle incoming streams
+    private static DataStorage instance;
     /**
      * Constructs a new instance of DataStorage, initializing the underlying storage
      * structure.
@@ -48,13 +48,21 @@ public class DataStorage {
      * @param timestamp        the time at which the measurement was taken, in
      * milliseconds since the Unix epoch
      */
-    public void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
-        Patient patient = patientMap.get(patientId);
-        if (patient == null) {
-            patient = new Patient(patientId);
-            patientMap.put(patientId, patient);
-        }
+    /**
+     * Adds or updates patient data in the storage and triggers real-time alerts.
+     * This method is synchronized to handle concurrent updates from the WebSocket stream safely.
+     */
+    public synchronized void addPatientData(int patientId, double measurementValue, String recordType, long timestamp) {
+        // Get or create patient
+        // computeIfAbsent handles the null check and map insertion in one thread-safe step.
+        Patient patient = patientMap.computeIfAbsent(patientId, k -> new Patient(k));
+
+        //  Add the health record to the patient's data history.
         patient.addRecord(measurementValue, recordType, timestamp);
+
+        // Added a real time trigger to immediately evaluate this patient for alerts.
+        // This ensures your system reacts to data the moment it arrives via WebSockets.
+        com.alerts.AlertGenerator.getInstance(this).evaluateData(patient);
     }
 
     /**
@@ -110,8 +118,8 @@ public class DataStorage {
                     ", Timestamp: " + record.getTimestamp());
         }
 
-        // Initialize the AlertGenerator with the storage
-        AlertGenerator alertGenerator = new AlertGenerator(storage);
+        // Initialize the AlertGenerator with the storage using Singleton getInstance method
+        AlertGenerator alertGenerator = AlertGenerator.getInstance(storage);
 
         // Evaluate all patients' data to check for conditions that may trigger alerts
         for (Patient patient : storage.getAllPatients()) {

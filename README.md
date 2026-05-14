@@ -17,6 +17,8 @@ The Cardio Data Simulator is a Java-based application designed to simulate real-
 ## Week 2: UML Models
 Added the 4 required UML class diagrams for the CHMS subsystems (Alert Generation, Data Storage, Patient Identification, and Data Access Layer).
 You can view the diagrams and the design rationale in the [uml_models](./uml_models) directory.
+## Reports
+Theres a file called reports that inlcudes inside it all the documantations needed along with their screenshots from the testing results found here:[reports](./reports)
 ### Prerequisites
 
 - Java JDK 11 or newer.

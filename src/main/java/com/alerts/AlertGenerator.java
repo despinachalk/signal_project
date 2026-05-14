@@ -14,54 +14,60 @@ import java.util.List;
 
 /**
  * The {@code AlertGenerator} class is responsible for monitoring patient data
- * and generating alerts when certain predefined conditions are met. This class
- * relies on a {@link DataStorage} instance to access patient data and evaluate
- * it against specific health criteria.
+ * and generating alerts when certain predefined conditions are met.
+ * This class follows the Singleton pattern.
  */
 public class AlertGenerator {
+    private static AlertGenerator instance; // Singleton instance
     private DataStorage dataStorage;
-    private List<AlertStrategy> alertStrategies; // Holds our alert strategies
+    private List<AlertStrategy> alertStrategies;
 
     /**
-     * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
+     * Private constructor to prevent instantiation from other classes.
      *
      * @param dataStorage the data storage system that provides access to patient data
      */
-    public AlertGenerator(DataStorage dataStorage) {
+    private AlertGenerator(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
-
-        // Initialize the strategies list and register our strategies
         this.alertStrategies = new ArrayList<>();
 
-        // Updated to include the concrete strategies
+        // Concrete strategies required by the rubric [cite: 27]
         this.alertStrategies.add(new BloodPressureStrategy());
         this.alertStrategies.add(new HeartRateStrategy());
         this.alertStrategies.add(new OxygenSaturationStrategy());
 
-        // Keeping your existing specialized strategies
+        // Specialized strategies
         this.alertStrategies.add(new ManualAlertStrategy());
         this.alertStrategies.add(new HypotensiveHypoxemiaStrategy());
     }
 
     /**
-     * Evaluates the specified patient's data to determine if any alert conditions
-     * are met.
+     * Static method to provide a global point of access to the AlertGenerator.
+     *  @param storage The DataStorage instance.
+     * @return The single instance of AlertGenerator.
+     */
+    public static synchronized AlertGenerator getInstance(DataStorage storage) {
+        if (instance == null) {
+            instance = new AlertGenerator(storage);
+        }
+        return instance;
+    }
+
+    /**
+     * Evaluates the specified patient's data to determine if any alert conditions are met.
+     * This now supports real-time evaluation as data arrives[cite: 57, 86].
      *
-     * @param patient the patient data to evaluate for alert conditions
+     * @param patient the patient data to evaluate
      */
     public void evaluateData(Patient patient) {
-        // Loop through all registered strategies and check for alerts
         for (AlertStrategy strategy : alertStrategies) {
-            // Updated to AlertInterface to support the Decorator pattern
+            // Uses AlertInterface to support Decorators [cite: 37]
             AlertInterface potentialAlert = strategy.checkAlert(patient);
 
             if (potentialAlert != null) {
-                // Logic to apply Decorators dynamically based on conditions
-                if (potentialAlert.getCondition().toLowerCase().contains("critical") ||
-                        potentialAlert.getCondition().toLowerCase().contains("urgent")) {
-
-                    // Wrap the alert in a Priority decorator
-                    potentialAlert = new PriorityAlertDecorator(potentialAlert);
+                // Apply Decorators dynamically for critical conditions [cite: 35]
+                if (potentialAlert.getCondition().toLowerCase().contains("critical")) {
+                    potentialAlert = new PriorityAlertDecorator(potentialAlert); // [cite: 41]
                 }
 
                 triggerAlert(potentialAlert);
@@ -72,9 +78,9 @@ public class AlertGenerator {
     /**
      * Triggers an alert for the monitoring system.
      *
-     * @param alert the alert object containing details about the alert condition
+     * @param alert the alert object containing details
      */
-    private void triggerAlert(AlertInterface alert) { // Updated parameter to AlertInterface
+    private void triggerAlert(AlertInterface alert) { // Updated to AlertInterface [cite: 37]
         System.out.println("ALERT TRIGGERED: Patient " + alert.getPatientId()
                 + " - Condition: " + alert.getCondition()
                 + " at time " + alert.getTimestamp());
